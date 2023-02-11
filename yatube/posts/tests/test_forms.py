@@ -79,4 +79,3 @@ class PostFormTests(TestCase):
         self.assertNotEqual(old_text.text, form_data['text'], error_name1)
         error_name2 = 'Пользователь не может изменить группу поста'
         self.assertNotEqual(old_text.group, form_data['group'], error_name2)
-

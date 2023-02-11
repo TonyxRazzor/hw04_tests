@@ -30,7 +30,7 @@ class Post(models.Model):
         return self.text[:15]
     text = models.TextField(
         verbose_name='Загаловок поста',
-        help_text = 'Введите текст поста'
+        help_text='Введите текст поста'
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -49,7 +49,7 @@ class Post(models.Model):
         on_delete=models.SET_NULL,
         related_name='posts',
         verbose_name='Группа',
-        help_text = 'Группа, к которой будет относится пост'
+        help_text='Группа, к которой будет относится пост'
     )
 
     class Meta:
