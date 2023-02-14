@@ -1,8 +1,6 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
-from ..models import Group, Post
 
-User = get_user_model()
+from posts.models import Group, Post, User
 
 
 class PostModelTest(TestCase):
@@ -17,8 +15,9 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            text='Тестовый пост' * 3,
         )
+        print(cls.post)
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""

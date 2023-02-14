@@ -1,11 +1,8 @@
 from http import HTTPStatus
+
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-
-from posts.models import Post, Group
-
-User = get_user_model()
+from posts.models import Group, Post, User
 
 
 class PostFormTests(TestCase):
@@ -20,7 +17,7 @@ class PostFormTests(TestCase):
                                           description='Описание')
 
     def test_create_post(self):
-        '''Проверка создания поста'''
+        """Проверка создания поста"""
         posts_count = Post.objects.count()
         form_data = {'text': 'Текст записанный в форму',
                      'group': self.group.id}
@@ -40,7 +37,7 @@ class PostFormTests(TestCase):
                          error_name2)
 
     def test_reddirect_guest_client(self):
-        '''Проверка редиректа неавторизованного пользователя'''
+        """Проверка редиректа неавторизованного пользователя"""
         self.post = Post.objects.create(text='Тестовый текст',
                                         author=self.user,
                                         group=self.group)
@@ -54,14 +51,11 @@ class PostFormTests(TestCase):
                              f'/auth/login/?next=/posts/{self.post.id}/edit/')
 
     def test_can_edit_post(self):
-        '''Проверка прав редактирования'''
+        """Проверка прав редактирования"""
         self.post = Post.objects.create(text='Тестовый текст',
                                         author=self.user,
                                         group=self.group)
         old_text = self.post
-    #    self.group2 = Group.objects.create(title='Тестовая группа2',
-    #                                      slug='test-group',
-    #                                       description='Описание')
         form_data = {'text': 'Текст записанный в форму',
                      'group': self.group.id}
         response = self.authorized_client.post(
@@ -69,13 +63,18 @@ class PostFormTests(TestCase):
             data=form_data,
             follow=True)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        error_name1 = 'Данные поста не совпадают'
         self.assertTrue(Post.objects.filter(
                         group=self.group.id,
                         author=self.user,
                         pub_date=self.post.pub_date
-                        ).exists(), error_name1)
-        error_name1 = 'Пользователь не может изменить содержание поста'
-        self.assertNotEqual(old_text.text, form_data['text'], error_name1)
-        error_name2 = 'Пользователь не может изменить группу поста'
-        self.assertNotEqual(old_text.group, form_data['group'], error_name2)
+                        ).exists(), 'Данные поста не совпадают')
+        self.assertNotEqual(
+            old_text.text,
+            form_data['text'],
+            'Пользователь не может изменить содержание поста'
+        )
+        self.assertNotEqual(
+            old_text.group,
+            form_data['group'],
+            'Пользователь не может изменить группу поста'
+        )
