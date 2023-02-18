@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from django.urls import reverse
 from django.test import Client, TestCase
 from posts.models import Group, Post, User
 
@@ -8,7 +9,7 @@ class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create(username="NoName")
+        cls.user = User.objects.create(username="Kurva")
         cls.group = Group.objects.create(
             title="Тестовая группа",
             slug="test-slug",
@@ -18,19 +19,24 @@ class PostURLTests(TestCase):
             author=cls.user,
             text="Тестовая пост",
         )
-        cls.templates = [
-            "/",
-            f"/group/{cls.group.slug}/",
-            f"/profile/{cls.user}/",
-            f"/posts/{cls.post.id}/",
-        ]
+
+        cls.templates = {
+            reverse("posts:index"): "posts/index.html",
+            reverse(
+                "posts:group_list", kwargs={"slug": cls.group.slug}
+            ): "posts/group_list.html",
+            reverse(
+                "posts:profile", kwargs={"username": cls.post.author}
+            ): "posts/profile.html",
+            reverse(
+                "posts:post_detail", kwargs={"post_id": cls.post.id}
+            ): "posts/post_detail.html",
+        }
         cls.templates_url_names = {
-            "/": "posts/index.html",
-            f"/group/{cls.group.slug}/": "posts/group_list.html",
-            f"/profile/{cls.user.username}/": "posts/profile.html",
-            f"/posts/{cls.post.id}/": "posts/post_detail.html",
-            f"/posts/{cls.post.id}/edit/": "posts/create_post.html",
-            "/create/": "posts/create_post.html",
+            reverse(
+                "posts:post_edit", kwargs={"post_id": cls.post.id}
+            ): "posts/create_post.html",
+            reverse("posts:post_create"): "posts/create_post.html",
         }
 
     def setUp(self):
